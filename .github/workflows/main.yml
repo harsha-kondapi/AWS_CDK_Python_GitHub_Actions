@@ -30,9 +30,9 @@ jobs:
       - name: Configure AWS credentials
         #uses: aws-actions/configure-aws-credentials@v1
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.IAM_USER_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.IAM_USER_SECRET_ACCESS_KEY }}
-        run: aws configure set aws_access_key_id ${{ secrets.IAM_USER_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.IAM_USER_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ env.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ env.AWS_REGION }}
       
       - name: Assume IAM Role and Tag Session
         run: aws sts assume-role --role-arn arn:aws:iam::617396901677:role/GitHubRole --role-session-name samplerolesession --region sa-east-1 --debug
