@@ -35,7 +35,7 @@ jobs:
         run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ env.AWS_REGION }}
       
       - name: Assume IAM Role and Tag Session
-        run: aws sts assume-role --role-arn arn:aws:iam::617396901677:role/GitHubRole --role-session-name samplerolesession --region sa-east-1 --debug
+        run: aws sts assume-role --role-arn arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/GitHubRole --role-session-name samplerolesession --region sa-east-1
           
       - name: Install npm
         run: 'sudo apt update -y && sudo apt install nodejs npm -y'
