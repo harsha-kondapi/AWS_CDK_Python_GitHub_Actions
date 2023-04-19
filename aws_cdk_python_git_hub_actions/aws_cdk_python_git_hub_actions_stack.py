@@ -22,7 +22,7 @@ class AwsCdkPythonGitHubActionsStack(Stack):
          )
 
         bucket = s3.Bucket(self, "cdk-source-bucket",
-                               encryption=aws_s3.BucketEncryption.KMS,
+                               encryption=s3.BucketEncryption.KMS,
                                bucket_key_enabled=True
                                )
 
