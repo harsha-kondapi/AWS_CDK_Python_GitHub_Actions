@@ -8,24 +8,35 @@ on:
   #  
   workflow_dispatch:
 
+env:
+  AWS_REGION: sa-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+  
 jobs:
-  deploy:
+  aws_cdk:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::617396901677:role/GitHubRole
-          role-session-name: samplerolesession
+        #uses: aws-actions/configure-aws-credentials@v1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.IAM_USER_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.IAM_USER_SECRET_ACCESS_KEY }}
+        run: aws configure set aws_access_key_id ${{ secrets.IAM_USER_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.IAM_USER_SECRET_ACCESS_KEY }} #&& aws configure set default.region ${{ env.AWS_REGION }}
+      
+      - name: Assume IAM Role and Tag Session
+        run: aws sts assume-role --role-arn arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/GitHubRole --role-session-name samplerolesession #--region sa-east-1
           
-
       - name: Install npm
         run: 'sudo apt update -y && sudo apt install nodejs npm -y'
         
@@ -35,13 +46,13 @@ jobs:
       - name: Intsall Requirements
         run: 'pip3 install -r requirements.txt'
         working-directory: .
+      
+      - name: CDK bootstrap
+        run: cdk bootstrap #aws://${{ env.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
+        working-directory: .
         
       - name: CDK Synth
         run: cdk synth
-        working-directory: .
-        
-      - name: CDK bootstrap
-        run: cdk bootstrap
         working-directory: .
         
       - name: CDK Deploy
